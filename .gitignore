@@ -1,0 +1,12 @@
+# Start Generation Here
+# This is a .gitignore file, so we will specify files and directories to ignore.
+# Common files to ignore in a project
+*.log
+*.tmp
+*.bak
+*.swp
+node_modules/
+dist/
+build/
+*.DS_Store
+# End Generation Here
