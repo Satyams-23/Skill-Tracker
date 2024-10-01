@@ -1,13 +1,18 @@
 const skillsList = [
-    'JavaScript', 'Python', 'Java', 'C++', 'HTML', 'CSS', 'React', 'Angular', 'Vue',
-    'Node.js', 'Express', 'Django', 'Flask', 'Spring', 'Docker', 'Kubernetes',
+    'JavaScript', 'Python', 'Java', 'C\\+\\+', 'HTML', 'CSS', 'React', 'Angular', 'Vue',
+    'Node\\.js', 'Express', 'Django', 'Flask', 'Spring', 'Docker', 'Kubernetes',
     'AWS', 'Azure', 'GCP', 'Git', 'SQL', 'MongoDB', 'Redis', 'GraphQL', 'REST API'
 ];
 
 export function identifySkills(content) {
-    const identifiedSkills = skillsList.filter(skill =>
-        new RegExp(`\\b${skill}\\b`, 'i').test(content)
-    );
+    const identifiedSkills = skillsList.filter(skill => {
+        try {
+            return new RegExp(`\\b${skill}\\b`, 'i').test(content);
+        } catch (error) {
+            console.error(`Error with regex for skill: ${skill}`, error);
+            return false;
+        }
+    });
     console.log('Identified skills:', identifiedSkills);
     return identifiedSkills;
 }

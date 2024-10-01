@@ -36,6 +36,10 @@ function trackPageVisit(url, tabId) {
     };
 
     chrome.tabs.sendMessage(tabId, { action: "getPageContent" }, response => {
+        if (chrome.runtime.lastError) {
+            console.error('Error sending message:', chrome.runtime.lastError);
+            return;
+        }
         console.log('Received page content:', response ? 'yes' : 'no');
         if (response && response.content) {
             userActivity[tabId].content = response.content;
@@ -45,12 +49,18 @@ function trackPageVisit(url, tabId) {
 
 function processPageData(url, timeSpent, content) {
     console.log('Processing page data:', url);
-    const skills = identifySkills(content);
-    console.log('Identified skills:', skills);
+    try {
+        const skills = identifySkills(content);
+        console.log('Identified skills:', skills);
 
-    updateSkillLevels(skills, timeSpent, content).then(() => {
-        console.log('Skills updated successfully');
-    });
+        updateSkillLevels(skills, timeSpent, content).then(() => {
+            console.log('Skills updated successfully');
+        }).catch(error => {
+            console.error('Error updating skills:', error);
+        });
+    } catch (error) {
+        console.error('Error processing page data:', error);
+    }
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -61,7 +71,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             const timeSinceLastActivity = currentTime - userActivity[tabId].lastActiveTime;
             userActivity[tabId].lastActiveTime = currentTime;
 
-            // Only count time if less than 5 minutes have passed since last activity
             if (timeSinceLastActivity < 5 * 60 * 1000) {
                 processPageData(userActivity[tabId].url, timeSinceLastActivity, userActivity[tabId].content);
             }
